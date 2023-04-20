@@ -1,0 +1,8 @@
+[banana, honey, ice, mango, peach, pineapple, strawberry, yogurt]
+[]
+[banana, chocolate, honey, ice, mango, peach, pineapple, strawberry, yogurt]
+[banana, honey, ice, mango, peach, pineapple, yogurt]
+[banana, chocolate, honey, ice, mango, peach, pineapple, yogurt]
+[banana, cherry, chocolate]
+[]
+[honey, ice, peach, pineapple, strawberry, yogurt]
