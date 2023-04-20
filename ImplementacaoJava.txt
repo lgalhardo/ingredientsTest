@@ -1,0 +1,99 @@
+package leo.teste.dev;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+
+import org.json.JSONObject;
+
+public class App 
+{
+    public static void main( String[] args )
+    {
+    	//Cenários de teste.
+    	System.out.println(Arrays.toString(getSmoothie("Classic")));
+    	System.out.println(Arrays.toString(getSmoothie("Clasic")));
+    	System.out.println(Arrays.toString(getSmoothie("Classic,+chocolate")));
+    	System.out.println(Arrays.toString(getSmoothie("Classic,-strawberry")));    	
+    	System.out.println(Arrays.toString(getSmoothie("Classic,+chocolate,-strawberry")));
+    	System.out.println(Arrays.toString(getSmoothie("Just Desserts,-ice cream,-peanut")));
+    	System.out.println(Arrays.toString(getSmoothie("Just Desserts,-banana,-cherry,-chocolate,-ice cream,-peanut")));
+        System.out.println(Arrays.toString(getSmoothie("Classic,-banana,-mango,-peanut")));
+
+    }
+    
+    public static String[] getSmoothie(String order) {
+
+    	ArrayList<String> orderIngredients = null;
+    	String[] orderSplited = null;
+    	//Boolean para verificar se foi informado uma adição/subtração de ingrediente.
+    	boolean hasAdditionalsOrDecrements = false;
+    	
+    	//Validação básica do smoothie solicitado
+    	if (order != null && !order.isEmpty()) {
+    		
+    		if (order.contains(",")) {
+    			orderSplited = order.split(",");
+    			String orderName = orderSplited[0];
+    			orderIngredients = findOrder(orderName);
+    			hasAdditionalsOrDecrements = true;
+    		} else {
+    			//Sem adições/remoções -- apenas o pedido
+    			orderIngredients = findOrder(order);
+    		}
+    		
+    	} else {
+    		System.out.println("Smoothie solicitado inválido.");
+    	}
+		
+    	//Verificação cenários onde não existe o smoothie ou nao tenha ingredientes cadastrados.
+    	if (!orderIngredients.isEmpty()) {
+    		if (hasAdditionalsOrDecrements) orderIngredients = addOrRemoveFlavor(orderSplited, orderIngredients);
+    	} 
+    	//Ordena os ingredientes
+        Collections.sort(orderIngredients);
+        
+    	return orderIngredients.toArray(new String[0]);
+    }
+
+    //Método para adicionar ou remover sabor
+	private static ArrayList<String> addOrRemoveFlavor(String[] orderSplited, ArrayList<String> orderIngredients) {
+	
+        for (String addOrRemove : orderSplited) {
+            if (addOrRemove.charAt(0) == '+') {
+            	orderIngredients.add(addOrRemove.substring(1));
+            } else if (addOrRemove.charAt(0) == '-') {
+            	orderIngredients.remove(addOrRemove.substring(1));
+            }
+        }
+        return orderIngredients;
+	}
+
+	//Método para localizar os detalhes do pedido (ingredientes smoothie)
+	private static ArrayList<String> findOrder(String orderName) {
+		
+		ArrayList<String> ingredientList = new ArrayList<String>();
+		
+		try{
+			//Possibilidade de recuperar os detalhes do pedido + ingredientes via banco (retorna uma string Json igual ao exercicio)
+			//orderService.find(orderName);
+			JSONObject orders = new JSONObject("{\r\n"
+					+ " \"Classic\": [\"strawberry\", \"banana\", \"pineapple\", \"mango\", \"peach\", \"honey\", \"ice\", \"yogurt\"],\r\n"
+					+ " \"Forest Berry\": [\"strawberry\", \"raspberry\", \"blueberry\", \"honey\", \"ice\", \"yogurt\"],\r\n"
+					+ " \"Freezie\": [\"blackberry\", \"blueberry\", \"black currant\", \"grape juice\", \"frozen yogurt\"],\r\n"
+					+ " \"Greenie\": [\"green apple\", \"kiwi\", \"lime\", \"avocado\", \"spinach\", \"ice\", \"apple juice\"],\r\n"
+					+ " \"Vegan Delite\": [\"strawberry\", \"passion fruit\", \"pineapple\", \"mango\", \"peach\", \"ice\", \"soy milk\"],\r\n"
+					+ " \"Just Desserts\": [\"banana\", \"ice cream\", \"chocolate\", \"peanut\", \"cherry\"]\r\n"
+					+ "}");
+			
+			//Faz a busca do smoothie solicitado, se não retornar nada o smoothie não existe (cai na exceção).
+			orders.getJSONArray(orderName).forEach(ingredient -> ingredientList.add(ingredient.toString()));
+			
+		} catch (Exception e) {
+			//O smoothie solicitado não existe.
+		}
+		
+		return ingredientList;
+	}
+	
+}
